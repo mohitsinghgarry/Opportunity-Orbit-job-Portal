@@ -7,17 +7,14 @@ require('dotenv').config()
 app.use(express.json())
 app.use(cors({
   origin: "http://localhost:5173",
-  methods: ["POST", "GET"],
-  credentials: true
+  // methods: ["POST", "GET"],
+  // credentials: true
 }
 ));
 
 app.get('/', (req, res) => {
   res.send('Hello Developer')
 })
-
-// Username - lakshay22dhoundiyal
-// Password - u97klyTxI0FAnbnn
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
