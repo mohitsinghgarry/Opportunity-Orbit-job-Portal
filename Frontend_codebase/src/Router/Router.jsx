@@ -31,7 +31,7 @@ const router = createBrowserRouter([
         {
           path: "/edit-job/:id",
           element: <UpdateJob/>,
-          loader: ({params}) => fetch(`https://localhost:3000/all-jobs/${params.id}`)
+          loader: ({params}) => fetch(`https://opportunity-orbit-job-portal.onrender.com/all-jobs/${params.id}`)
         },
         {
           path: "/job/:id",

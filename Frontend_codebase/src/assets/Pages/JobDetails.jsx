@@ -8,7 +8,7 @@ const JobDetails = () => {
     const {id} = useParams();
     const [job, setJob] = useState([])
     useEffect(() => {
-        fetch(`https://localhost:3000/all-jobs/${id}`).then(res => res.json()).then(data => setJob(data))
+        fetch(`https://opportunity-orbit-job-portal.onrender.com/all-jobs/${id}`).then(res => res.json()).then(data => setJob(data))
     }, [])
 
     const handleApply = async() => {

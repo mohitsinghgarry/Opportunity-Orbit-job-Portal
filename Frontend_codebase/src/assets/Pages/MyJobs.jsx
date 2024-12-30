@@ -12,7 +12,7 @@ const MyJobs = () => {
 
   useEffect(() => {
     setIsLoading(true)
-    fetch(`https://localhost:3000/myJobs/riyontech@gmail.com`).then(res => res.json()).then(data => {
+    fetch(`https://opportunity-orbit-job-portal.onrender.com/myJobs/riyontech@gmail.com`).then(res => res.json()).then(data => {
       setJobs(data);
       setIsLoading(false);
     });
@@ -46,7 +46,7 @@ const MyJobs = () => {
 
   const handleDelete = (id) => {
     // console.log(id);
-    fetch(`https://localhost:3000/job/${id}`, {
+    fetch(`https://opportunity-orbit-job-portal.onrender.com/job/${id}`, {
       method: "DELETE"
     })
       .then((res) => res.json)
