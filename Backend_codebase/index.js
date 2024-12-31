@@ -6,7 +6,7 @@ require('dotenv').config()
 // Middleware
 app.use(express.json())
 app.use(cors({
-  origin: "*",
+  origin: "https://opportunityorbitjobportal.netlify.app",
   methods: ["POST", "GET"],
   credentials: true
 }
