@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Basic form styles */
+.create-job-flex {
+    @apply flex flex-col lg:flex-row gap-4 mb-4;
+}
+
+.create-job-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500;
+}

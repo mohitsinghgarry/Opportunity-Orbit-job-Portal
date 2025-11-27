@@ -50,21 +50,45 @@ Follow these steps to set up the project locally:
    cd Opportunity-Orbit-job-Portal  
    ```  
 
-3. **Install dependencies**:  
+3. **Install dependencies for both frontend and backend**:  
    ```bash  
-   npm install  
+   # Install backend dependencies
+   cd Backend_codebase
+   npm install
+   
+   # Install frontend dependencies  
+   cd ../Frontend_codebase
+   npm install
    ```  
 
-4. **Start the development server**:  
-   ```bash  
-   npm start  
-   ```  
-
-5. **Environment Variables**:  
-   Configure the `.env` file with the following:  
+4. **Environment Variables**:  
+   
+   **Backend (.env in Backend_codebase/)**:
    ```plaintext  
-   DB_USER=<your-mongodb-username-string>  
-   DB_PASSWORD=<your-db-password>  
+   DB_USER=<your-mongodb-username>  
+   DB_PASSWORD=<your-mongodb-password>
+   NODE_ENV=development
+   ```
+   
+   **Frontend (.env in Frontend_codebase/)**:
+   ```plaintext
+   VITE_FIREBASE_API_KEY=<your-firebase-api-key>
+   VITE_FIREBASE_AUTH_DOMAIN=<your-firebase-auth-domain>
+   VITE_FIREBASE_PROJECT_ID=<your-firebase-project-id>
+   VITE_FIREBASE_STORAGE_BUCKET=<your-firebase-storage-bucket>
+   VITE_FIREBASE_MESSAGING_SENDER_ID=<your-firebase-messaging-sender-id>
+   VITE_FIREBASE_APP_ID=<your-firebase-app-id>
+   VITE_FIREBASE_MEASUREMENT_ID=<your-firebase-measurement-id>
+   VITE_API_URL=http://localhost:3000
+   ```
+
+5. **Start the development servers**:  
+   ```bash  
+   # Start backend server (from Backend_codebase directory)
+   npm run dev
+   
+   # Start frontend server (from Frontend_codebase directory)  
+   npm run dev
    ```  
 
 ---

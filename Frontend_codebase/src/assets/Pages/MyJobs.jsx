@@ -12,8 +12,14 @@ const MyJobs = () => {
 
   useEffect(() => {
     setIsLoading(true)
-    fetch(`https://opportunity-orbit-job-portal.onrender.com/myJobs/riyontech@gmail.com`).then(res => res.json()).then(data => {
+    // Get user email from localStorage or authentication context
+    const userEmail = localStorage.getItem('userEmail') || 'demo@example.com';
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    fetch(`${apiUrl}/myJobs/${userEmail}`).then(res => res.json()).then(data => {
       setJobs(data);
+      setIsLoading(false);
+    }).catch(error => {
+      console.error('Error fetching jobs:', error);
       setIsLoading(false);
     });
   }, [searchText]);
@@ -45,16 +51,30 @@ const MyJobs = () => {
   }
 
   const handleDelete = (id) => {
-    // console.log(id);
-    fetch(`https://opportunity-orbit-job-portal.onrender.com/job/${id}`, {
-      method: "DELETE"
-    })
-      .then((res) => res.json)
-      .then((data) => {
-        if (data.acknowledged === true) {
-          alert("Job Deleted Sucessfully!");
-        }
-      });
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      console.log('Attempting to delete job with ID:', id);
+      fetch(`${apiUrl}/job/${id}`, {
+        method: "DELETE"
+      })
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) {
+            alert(`Error: ${data.message || 'Failed to delete job.'}`);
+            throw new Error(data.message || 'Failed to delete job.');
+          }
+          if (data.deletedCount > 0) {
+            alert("Job Deleted Successfully!");
+            setJobs(jobs.filter(job => job._id !== id));
+          } else {
+            alert("Job not found or could not be deleted.");
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting job:', error);
+          alert('Error deleting job. Please try again.');
+        });
+    }
   };
 
   // console.log(searchText)
@@ -70,9 +90,7 @@ const MyJobs = () => {
             name="search"
             placeholder="Search for Job Profile"
             className="py-2 pl-3 border border-yellow-500 focus-within:ring-yellow-500 lg:w-6/12 mb-4 w-full"
-            style={{ // Inline style to set focus ring color
-              outlineColor: 'yellow', // Replace with your desired blue color
-            }}
+            style={{ outlineColor: 'yellow' }}
           />
           <button className="bg-yellow-500 text-white font-semibold px-8 py-2 rounded-sm mb-4" onClick={handleSearch}>
             Search
@@ -80,7 +98,7 @@ const MyJobs = () => {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table or Empty State */}
       <section className="py-1 bg-blueGray-50">
         <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-5">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
@@ -96,89 +114,60 @@ const MyJobs = () => {
             </div>
 
             <div className="block w-full overflow-x-auto">
-              <table className="items-center bg-transparent w-full border-collapse ">
-                <thead>
-                  <tr>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      NO.
-                    </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      TITLE
-                    </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      COMPANY NAME
-                    </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      SALARY
-                    </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      EDIT
-                    </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      DELETE
-                    </th>
-                  </tr>
-                </thead>
-
-                {
-                  isLoading ? (<div className="flex items-center justify-center h-20"><p className="">Loading...</p></div>) :
-                    (<tbody>
-                      {
-                        currentJobs.map((job, index) => (
-
-                          <tr key={index}>
-                            <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                              {index + 1}
-                            </th>
-                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                              {job.jobTitle}
-                            </td>
-                            <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                              {job.companyName}
-                            </td>
-                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                              ${job.minPrice} - ${job.maxPrice}
-                            </td>
-                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                              <button>
-                                <Link to={`/edit-job/${job?._id}`}>Edit</Link>
-                              </button>
-                            </td>
-                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                              <button onClick={() => handleDelete(job._id)} className="bg-red-700 py-2 px-6 text-white rounded-sm">
-                                Delete
-                              </button>
-                            </td>
-                          </tr>))
-                      }
-
-                    </tbody>
-                    )
-                }
-
-              </table>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-20"><p>Loading...</p></div>
+              ) : jobs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-40">
+                  <p className="text-lg text-gray-500 mb-4">You haven't posted or applied to any jobs yet.</p>
+                  <Link to="/post-job">
+                    <button className="bg-yellow-500 text-white font-semibold px-8 py-2 rounded shadow hover:bg-yellow-600 transition">Post a Job</button>
+                  </Link>
+                </div>
+              ) : (
+                <table className="items-center bg-transparent w-full border-collapse ">
+                  <thead>
+                    <tr>
+                      <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">NO.</th>
+                      <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">TITLE</th>
+                      <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">COMPANY NAME</th>
+                      <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">SALARY</th>
+                      <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">EDIT</th>
+                      <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DELETE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentJobs.map((job, index) => (
+                      <tr key={index}>
+                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">{index + 1}</th>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">{job.jobTitle}</td>
+                        <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">{job.companyName}</td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">${job.minPrice} - ${job.maxPrice}</td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                          <button><Link to={`/edit-job/${job?._id}`}>Edit</Link></button>
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                          <button onClick={() => handleDelete(job._id)} className="bg-red-700 py-2 px-6 text-white rounded-sm">Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
 
         {/* Pagination */}
-
-        <div className="flex justify-center text-black space-x-8 mb-8">
-          {
-            currentPage > 1 && (
-              <button className="hover:underline font-bold" onClick={prevPage}>
-                Previous
-              </button>
-            )
-          }
-          {
-            indexOfLastItem < jobs.length && (
-              <button className="hover:underline font-bold" onClick={nextPage}>
-                Next
-              </button>
-            )
-          }
-        </div>
+        {jobs.length > 0 && (
+          <div className="flex justify-center text-black space-x-8 mb-8">
+            {currentPage > 1 && (
+              <button className="hover:underline font-bold" onClick={prevPage}>Previous</button>
+            )}
+            {indexOfLastItem < jobs.length && (
+              <button className="hover:underline font-bold" onClick={nextPage}>Next</button>
+            )}
+          </div>
+        )}
 
         <footer className="relative pt-8 pb-6 mt-16">
           <div className="container mx-auto px-4">
@@ -192,7 +181,6 @@ const MyJobs = () => {
           </div>
         </footer>
       </section>
-
     </div>
   )
 };

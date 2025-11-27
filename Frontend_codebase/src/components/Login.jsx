@@ -17,11 +17,14 @@ const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      // Get user's name for display
-      const userName = user.displayName || user.email.split('@')[0]; // Use display name if available, fallback to email before "@"
+      // Save user email to localStorage for My Jobs
+      localStorage.setItem('userEmail', user.email);
 
-      setUser(user); // Update user state
-      navigate('/', { replace: true }); // Redirect to home page after login
+      // Get user's name for display
+      const userName = user.displayName || user.email.split('@')[0];
+
+      setUser(user);
+      navigate('/', { replace: true });
 
       Swal.fire({
         icon: 'success',
@@ -30,8 +33,7 @@ const Login = () => {
       });
     } catch (error) {
       const errorMessage = error.message;
-      console.error('Login error:', errorMessage); // Log error for debugging
-      // Handle errors as needed (e.g., display error message to user)
+      console.error('Login error:', errorMessage);
     }
   };
 
@@ -75,7 +77,7 @@ const Login = () => {
           </button>
         </div>
       ) : (
-        <button className="bg-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleLogin}>
+        <button className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleLogin}>
           Login with Google
         </button>
       )}
